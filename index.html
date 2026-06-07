@@ -193,6 +193,31 @@
   footer p { font-size:.78rem; color:var(--text3); }
   .footer-logo { font-family:'DM Serif Display',serif; color:var(--accent); font-size:.95rem; }
 
+  /* CHARTS */
+  .chart-wrap { margin-top:1.75rem; padding-top:1.5rem; border-top:1px solid var(--border); }
+  .chart-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:1rem; flex-wrap:wrap; gap:.5rem; }
+  .chart-title { font-size:.78rem; letter-spacing:.08em; text-transform:uppercase; color:var(--accent); }
+  .chart-legend { display:flex; gap:1rem; }
+  .legend-item { display:flex; align-items:center; gap:.4rem; font-size:.72rem; color:var(--text2); cursor:pointer; user-select:none; transition:opacity .2s; }
+  .legend-item.off { opacity:.35; }
+  .legend-swatch { width:10px; height:10px; border-radius:2px; }
+  .chart-svg { width:100%; height:auto; display:block; overflow:visible; }
+  .chart-line { fill:none; stroke-width:2; transition:opacity .2s; }
+  .chart-area { transition:opacity .2s; }
+  .chart-dot { cursor:pointer; transition:r .15s; }
+  .chart-bar { transition:opacity .2s; cursor:pointer; }
+  .chart-bar:hover { opacity:.8; }
+  .chart-axis-label { font-size:9px; fill:var(--text3); }
+  .chart-grid-line { stroke:var(--border); stroke-width:1; }
+  .chart-tooltip { position:absolute; background:var(--bg); border:1px solid var(--border2); border-radius:4px; padding:.5rem .7rem; font-size:.72rem; pointer-events:none; opacity:0; transition:opacity .15s; white-space:nowrap; z-index:5; box-shadow:0 4px 16px rgba(0,0,0,.4); }
+  .chart-tooltip .tt-label { color:var(--text3); margin-bottom:.2rem; }
+  .chart-tooltip .tt-row { color:var(--text); display:flex; align-items:center; gap:.4rem; }
+  .chart-tooltip .tt-dot { width:8px; height:8px; border-radius:50%; }
+  .modal-stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(110px,1fr)); gap:.75rem; margin-top:1.5rem; }
+  .modal-stat { background:var(--card); border:1px solid var(--border); border-radius:3px; padding:.85rem; }
+  .modal-stat .ms-num { font-family:'DM Serif Display',serif; font-size:1.4rem; color:var(--accent); line-height:1.1; }
+  .modal-stat .ms-label { font-size:.68rem; color:var(--text3); letter-spacing:.03em; margin-top:.2rem; }
+
   .reveal { opacity:0; transform:translateY(28px); transition:opacity .7s ease,transform .7s ease; }
   .reveal.visible { opacity:1; transform:none; }
 
@@ -233,7 +258,7 @@
       <div class="stat"><div class="stat-num" data-count="4" data-suffix="+">0</div><div class="stat-label">Years in fintech PM</div></div>
       <div class="stat"><div class="stat-num" data-count="22" data-suffix="%">0</div><div class="stat-label">Drop-off reduction</div></div>
       <div class="stat"><div class="stat-num" data-count="87" data-suffix="%">0</div><div class="stat-label">Support calls cut</div></div>
-      <div class="stat"><div class="stat-num" data-count="5" data-suffix="">0</div><div class="stat-label">Products shipped</div></div>
+      <div class="stat"><div class="stat-num" data-count="7" data-suffix="">0</div><div class="stat-label">Products shipped</div></div>
     </div>
     <div class="hero-ctas">
       <a href="#contact" class="btn-primary">Get in touch <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
@@ -393,25 +418,60 @@
     <div class="modal-co" id="modal-co"></div>
     <div class="modal-title" id="modal-title"></div>
     <div class="modal-body" id="modal-body"></div>
+    <div class="modal-stats" id="modal-stats"></div>
+    <div class="chart-wrap" id="modal-chart-wrap" style="display:none;">
+      <div class="chart-head">
+        <span class="chart-title" id="chart-title"></span>
+        <div class="chart-legend" id="chart-legend"></div>
+      </div>
+      <div style="position:relative;">
+        <div id="chart-container"></div>
+        <div class="chart-tooltip" id="chart-tooltip"></div>
+      </div>
+    </div>
     <div class="modal-metrics" id="modal-metrics"></div>
   </div>
 </div>
 
 <script>
 const products = [
-  { n:'01', name:'InstaQuote', co:'HDFC Life', desc:'Turned a 20-minute insurance pitch into a 20-second smart recommendation engine.', metric:'18% conversion uplift',
+  { n:'01', name:'InstaQuote', co:'HDFC Life', desc:'Turned a 20-minute insurance pitch into a 20-second smart recommendation engine.', metric:'333K+ quotes generated monthly',
     body:`<p>The challenge was two-sided. For agents, generating quotes meant juggling manual calculators and actuarial formulas, often in front of customers, which wasn't a great look. For customers, exploring plans without an agent was impossible, so many simply dropped off or went with competitors.</p><p>I sat with the actuarial team and my tech lead to map out formulas for <strong>over 100 products</strong>, then built InstaQuote: a rule engine that instantly generated quotes based on customer profiling and historical behaviour. It didn't stop at quotes, it recommended the most relevant plan.</p><p>To boost trust, I pushed for <strong>"Beat the Quote"</strong>, letting customers instantly compare our plans against competitors' premiums and coverage.</p>`,
+    stats:[['420K','Peak monthly quotes'],['77K','Peak monthly users'],['100+','Products mapped'],['20s','Quote time']],
+    chart:{ type:'line', title:'Monthly usage (2023)',
+      labels:['Jan','Feb','Mar','Apr','May','Jun','Jul'],
+      series:[
+        { name:'Quotes generated', color:'#C8A96E', data:[318599,380184,420355,226771,312906,300446,333254] },
+        { name:'Active users', color:'#57C99A', data:[56380,65309,77044,56302,57439,58499,56711] }
+      ] },
     metrics:[['18%','Conversion uplift'],['20s','Quote time'],['100+','Products mapped']] },
-  { n:'02', name:'Pehchaan', co:'HDFC Ergo', desc:'A KYC platform that cut out every vendor and built reliability in-house.', metric:'87.5% less manual verification',
+  { n:'02', name:'InstaSIP', co:'HDFC Life', desc:'A fully integrated ULIP STP journey that mirrors the simplicity of mutual funds.', metric:'₹1.95 Cr revenue generated',
+    body:`<p>InstaSIP delivers a web-based ULIP STP journey that feels as smooth as buying a mutual fund, accessible from anywhere. It's built to flex to partner needs, supporting both <strong>assisted and non-assisted</strong> flows.</p><p>I kept form fill-ups minimal and wired in seamless partner API integrations for KYC, while heavier customisations like data fetch are handled at HDFC Life's end. The result is a clean, personalised onboarding that users can actually finish.</p><p>Of <strong>1,228 applications</strong> created, 544 converted into policies, with a most-selected premium of ₹4,000.</p>`,
+    stats:[['1,228','Applications created'],['544','Policies converted'],['₹1.95 Cr','Revenue generated'],['₹4,000','Top premium']],
+    chart:{ type:'bar', title:'Application outcomes',
+      labels:['Created','Converted','Cancelled'],
+      series:[{ name:'Applications', color:'#C8A96E', data:[1228,544,657] }] },
+    metrics:[['1,228','Applications'],['544','Conversions'],['₹1.95 Cr','Revenue']] },
+  { n:'03', name:'InstaPRL', co:'HDFC Life', desc:'A mobile platform for field teams to upload, track, and process FC applications anywhere.', metric:'1,00,000+ applications processed',
+    body:`<p>InstaPRL is a mobile-first platform letting field teams upload new FC applications, track ongoing ones, and submit documents from anywhere. <strong>OCR</strong> automates form-filling, and dedicated dashboards give both agents and senior stakeholders visibility into application status.</p><p>It runs across <strong>3 channels</strong>, has onboarded 28,000+ FCs, and processed over 1,00,000 applications with a 35-day operational turnaround. The chart shows CIIN generated versus licenses issued across two financial years.</p>`,
+    stats:[['1,00,000+','Applications'],['28,000+','FCs onboarded'],['60,000+','Scrutiny done'],['35 days','Operational TAT']],
+    chart:{ type:'bar', title:'CIIN generated vs licenses issued',
+      labels:['FY 22-23','FY 23-24'],
+      series:[
+        { name:'CIIN generated', color:'#C8A96E', data:[121029,65955] },
+        { name:'Licenses issued', color:'#57C99A', data:[50162,25077] }
+      ] },
+    metrics:[['1L+','Applications'],['28K+','FCs onboarded'],['3','Channels']] },
+  { n:'04', name:'Pehchaan', co:'HDFC Ergo', desc:'A KYC platform that cut out every vendor and built reliability in-house.', metric:'87.5% less manual verification',
     body:`<p>When I took over Pehchaan, it was completely vendor-led. That meant two problems: vendor dependency (if a vendor went down, we went down) and a fragmented user experience where every KYC type had its own authority and felt repetitive.</p><p>On the infrastructure side, I cut the vendors out and integrated directly with <strong>CERSAI, UIDAI, and DigiLocker</strong>. We built an in-house OCR, training two engines on different datasets and comparing results for a confidence score, which meant higher reliability and no downtime.</p><p>On the experience side, I ran user and agent interviews and redesigned the journey into <strong>3 clear steps</strong>: ask for PAN plus one backup ID, verify via OTP if already registered, otherwise OCR autofills from the backup ID.</p><p>We became the only company in our segment doing KYC without vendors.</p>`,
     metrics:[['87.5%','Less manual work'],['0','Vendors'],['2x','OCR confidence']] },
-  { n:'03', name:'CX Claim Tracker', co:'HDFC Ergo', desc:'Made insurance claims feel like ordering on Swiggy.', metric:'87% drop in support calls',
+  { n:'05', name:'CX Claim Tracker', co:'HDFC Ergo', desc:'Made insurance claims feel like ordering on Swiggy.', metric:'87% drop in support calls',
     body:`<p>When I joined, claimants were calling agents in <strong>87% of cases</strong> just to check status. The existing trackers were full of jargon, and there were multiple trackers depending on claim type. Structured user interviews showed customers felt anxious: they didn't understand the stages, didn't trust the timeframes, and had zero visibility.</p><p>On the backend, I discovered there were <strong>120+ sub-stages</strong> in a claim. That complexity was the root cause.</p><p>I redesigned the tracker, inspired by food delivery apps, into one unified tracker with just <strong>5 user-facing stages</strong>, each in plain language with a time estimate, real-time updates, and nudges on every bit of progress.</p>`,
     metrics:[['87%','Fewer calls'],['120→5','Stages simplified'],['1','Unified tracker']] },
-  { n:'04', name:'Account Aggregator', co:'HDFC Ergo', desc:'Consent-based financial data sharing on the Sahamati framework.', metric:'30% better triage accuracy',
+  { n:'06', name:'Account Aggregator', co:'HDFC Ergo', desc:'Consent-based financial data sharing on the Sahamati framework.', metric:'30% better triage accuracy',
     body:`<p>I led consent-based financial data sharing on the <strong>Sahamati</strong> framework. I designed the user research around data-sharing flows and trust-building, since asking users to share financial data demands a very deliberate, reassuring experience.</p><p>I partnered with ML teams to define the AI/ML schema for risk scoring models, which reduced KYC turnaround and improved claim triage accuracy by <strong>30%</strong>.</p>`,
     metrics:[['30%','Triage accuracy'],['Consent','First design'],['Sahamati','Framework']] },
-  { n:'05', name:'NFT Credentials', co:'HashStudy', desc:'Blockchain-verified certificates adopted by 12+ institutions.', metric:'90% better fraud detection',
+  { n:'07', name:'NFT Credentials', co:'HashStudy', desc:'Blockchain-verified certificates adopted by 12+ institutions.', metric:'90% better fraud detection',
     body:`<p>At HashStudy, a pioneer of Web3 in India, I built a blockchain credential issuance product. On-chain verification meant certificates couldn't be faked, improving fraud detection by <strong>90%</strong>.</p><p>The platform was adopted by <strong>12+ institutional clients</strong>. I also created an in-house dev sandbox so new learners could visualise and experiment with the Web3 environment, and designed AI-ready structures for learning-path optimisation based on user interaction patterns.</p>`,
     metrics:[['90%','Fraud detection'],['12+','Clients'],['On-chain','Verification']] }
 ];
@@ -430,6 +490,10 @@ function openModal(p){
   document.getElementById('modal-co').textContent=p.co;
   document.getElementById('modal-title').textContent=p.name;
   document.getElementById('modal-body').innerHTML=p.body;
+  const statsEl=document.getElementById('modal-stats');
+  statsEl.innerHTML=(p.stats||[]).map(s=>`<div class="modal-stat"><div class="ms-num">${s[0]}</div><div class="ms-label">${s[1]}</div></div>`).join('');
+  const chartWrap=document.getElementById('modal-chart-wrap');
+  if(p.chart){ chartWrap.style.display='block'; renderChart(p.chart); } else { chartWrap.style.display='none'; }
   document.getElementById('modal-metrics').innerHTML=p.metrics.map(m=>`<div class="modal-metric"><div class="mm-num">${m[0]}</div><div class="mm-label">${m[1]}</div></div>`).join('');
   overlay.classList.add('open'); document.body.style.overflow='hidden';
 }
@@ -437,6 +501,61 @@ function closeModal(){ overlay.classList.remove('open'); document.body.style.ove
 document.getElementById('modal-close').addEventListener('click',closeModal);
 overlay.addEventListener('click',e=>{ if(e.target===overlay) closeModal(); });
 document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeModal(); });
+
+// ── INTERACTIVE CHART ENGINE (vanilla SVG) ──
+const fmt=n=> n>=100000 ? (n/100000).toFixed(n%100000?1:0)+'L' : n>=1000 ? (n/1000).toFixed(n%1000?1:0)+'K' : n.toLocaleString('en-IN');
+const tip=document.getElementById('chart-tooltip');
+let chartActive={};
+function renderChart(cfg){
+  document.getElementById('chart-title').textContent=cfg.title;
+  const legend=document.getElementById('chart-legend');
+  chartActive={};
+  legend.innerHTML=cfg.series.map((s,i)=>{ chartActive[i]=true; return `<span class="legend-item" data-i="${i}"><span class="legend-swatch" style="background:${s.color}"></span>${s.name}</span>`; }).join('');
+  legend.querySelectorAll('.legend-item').forEach(el=>{
+    el.addEventListener('click',()=>{ const i=+el.dataset.i; chartActive[i]=!chartActive[i]; el.classList.toggle('off',!chartActive[i]); draw(cfg); });
+  });
+  draw(cfg);
+}
+function draw(cfg){
+  const W=560,H=300,pl=46,pr=16,pt=18,pb=42, iw=W-pl-pr, ih=H-pt-pb;
+  const vis=cfg.series.filter((s,i)=>chartActive[i]);
+  let max=0; vis.forEach(s=>s.data.forEach(v=>{ if(v>max)max=v; }));
+  if(max===0)max=1; max=max*1.1;
+  const x=i=>pl+(cfg.labels.length<=1?iw/2:(i/(cfg.labels.length-1))*iw);
+  const y=v=>pt+ih-(v/max)*ih;
+  let svg=`<svg class="chart-svg" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">`;
+  for(let g=0;g<=4;g++){ const gy=pt+(g/4)*ih; const gv=max-(g/4)*max; svg+=`<line class="chart-grid-line" x1="${pl}" y1="${gy}" x2="${W-pr}" y2="${gy}"/><text class="chart-axis-label" x="${pl-8}" y="${gy+3}" text-anchor="end">${fmt(Math.round(gv))}</text>`; }
+  cfg.labels.forEach((l,i)=>{ const lx=cfg.type==='bar'?pl+((i+0.5)/cfg.labels.length)*iw:x(i); svg+=`<text class="chart-axis-label" x="${lx}" y="${H-pb+18}" text-anchor="middle">${l}</text>`; });
+  if(cfg.type==='line'){
+    cfg.series.forEach((s,si)=>{ if(!chartActive[si])return;
+      let d=s.data.map((v,i)=>`${i===0?'M':'L'}${x(i)},${y(v)}`).join(' ');
+      let area=d+` L${x(s.data.length-1)},${pt+ih} L${x(0)},${pt+ih} Z`;
+      svg+=`<path class="chart-area" d="${area}" fill="${s.color}" opacity="0.07"/>`;
+      svg+=`<path class="chart-line" d="${d}" stroke="${s.color}"/>`;
+      s.data.forEach((v,i)=>{ svg+=`<circle class="chart-dot" cx="${x(i)}" cy="${y(v)}" r="4" fill="${s.color}" data-si="${si}" data-i="${i}"/>`; });
+    });
+  } else {
+    const groups=cfg.labels.length, gw=iw/groups, vn=vis.length, bw=Math.min(gw*0.6/vn,46);
+    cfg.labels.forEach((l,gi)=>{ let vi=0; cfg.series.forEach((s,si)=>{ if(!chartActive[si])return;
+      const gx=pl+gi*gw+gw/2, bx=gx-(vn*bw)/2+vi*bw, bh=(s.data[gi]/max)*ih;
+      svg+=`<rect class="chart-bar" x="${bx}" y="${pt+ih-bh}" width="${bw-3}" height="${bh}" rx="2" fill="${s.color}" data-si="${si}" data-gi="${gi}"/>`;
+      svg+=`<text class="chart-axis-label" x="${bx+(bw-3)/2}" y="${pt+ih-bh-5}" text-anchor="middle" fill="var(--text2)">${fmt(s.data[gi])}</text>`;
+      vi++; }); });
+  }
+  svg+=`</svg>`;
+  const cont=document.getElementById('chart-container'); cont.innerHTML=svg;
+  cont.querySelectorAll('.chart-dot,.chart-bar').forEach(el=>{
+    el.addEventListener('mousemove',ev=>{
+      const si=+el.dataset.si, idx=el.dataset.i!==undefined?+el.dataset.i:+el.dataset.gi;
+      const s=cfg.series[si];
+      tip.innerHTML=`<div class="tt-label">${cfg.labels[idx]}</div><div class="tt-row"><span class="tt-dot" style="background:${s.color}"></span>${s.name}: <strong>${s.data[idx].toLocaleString('en-IN')}</strong></div>`;
+      const r=cont.getBoundingClientRect();
+      tip.style.left=(ev.clientX-r.left+12)+'px'; tip.style.top=(ev.clientY-r.top-10)+'px'; tip.style.opacity='1';
+      if(el.classList.contains('chart-dot'))el.setAttribute('r','6');
+    });
+    el.addEventListener('mouseleave',()=>{ tip.style.opacity='0'; if(el.classList.contains('chart-dot'))el.setAttribute('r','4'); });
+  });
+}
 
 const obs=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible'); obs.unobserve(e.target);}})},{threshold:0.08});
 document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
